@@ -1,0 +1,106 @@
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+body {
+	background-color: #111;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+#player {
+	width: 0;
+	height: 0;
+	border-left: 12px solid transparent;
+	border-right: 12px solid transparent;
+	border-bottom: 20px solid #f0f;
+	position: absolute;
+} 
+
+#pause {
+	color: #fff;
+	position: absolute;
+	top: 10px;
+	left: 300px;
+}
+
+.highlight {
+	color: #f0f !important;
+	border-color: #f0f !important;
+	/* Glow Effect! WOOO! */
+	box-shadow: 0px 0px 5px 5px rgba(255, 0, 255, .5);
+}
+
+#keys {
+	position: absolute;
+	top: 70px;
+	left: 10px;
+}
+
+#keys h3 {
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	display: inline-block;
+	color: #fff;
+	border: 1px solid #fff;
+	padding: 3px;
+	border-radius: 3px;
+	padding: 2px;
+}
+
+#w {
+	position: relative;
+	top: -32px;
+	left: -61px;
+}
+
+#frame {
+	color: #fff;
+	position: absolute;
+	top: 140px;
+	left: 10px;
+}
+
+#space {
+	width: 85px !important;
+	position: relative;
+	top: 33px;
+	left: -124px;
+}
+
+#time {
+	position: absolute;
+	top: 180px;
+	left: 10px;
+	color: #fff;
+}
+
+#fps {
+	position: absolute;
+	top: 160px;
+	left: 10px;
+	color: #fff;
+}
+
+.hidden {
+	display: none;
+}
+
+.top {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	display: inline-block;
+}
+
+label {
+	color: #fff;
+}
+
+.bullet {
+	height: 5px;
+	width: 5px;
+	background-color: #ff0;
+	border-radius: 50%;
+}
