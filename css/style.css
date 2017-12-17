@@ -1,106 +1,129 @@
+/* Color variables to play with */
+:root {
+    /* Transparent Grey */
+    --panel: rgba(155, 155, 155, 0.3);
+    /* Backround Color */
+    --field: #111;
+    /* Player color */
+    --player: #f0f;
+    /* Transparent Player */
+    --tran: rgba(255, 0, 255, .5);
+    /* Text Color */
+    --text: #fff;
+    /* Bullet Color */
+    --bullet: #ff0;
+}
+
+/* CSS reset */
 * {
-	margin: 0px;
-	padding: 0px;
+    margin: 0px;
+    padding: 0px;
 }
 
 body {
-	background-color: #111;
-	font-family: Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--field);
 }
 
 #player {
-	width: 0;
-	height: 0;
-	border-left: 12px solid transparent;
-	border-right: 12px solid transparent;
-	border-bottom: 20px solid #f0f;
-	position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid var(--player);
+    position: absolute;
 } 
 
 #pause {
-	color: #fff;
-	position: absolute;
-	top: 10px;
-	left: 300px;
-}
-
-.highlight {
-	color: #f0f !important;
-	border-color: #f0f !important;
-	/* Glow Effect! WOOO! */
-	box-shadow: 0px 0px 5px 5px rgba(255, 0, 255, .5);
-}
-
-#keys {
-	position: absolute;
-	top: 70px;
-	left: 10px;
-}
-
-#keys h3 {
-	width: 20px;
-	height: 20px;
-	text-align: center;
-	display: inline-block;
-	color: #fff;
-	border: 1px solid #fff;
-	padding: 3px;
-	border-radius: 3px;
-	padding: 2px;
-}
-
-#w {
-	position: relative;
-	top: -32px;
-	left: -61px;
-}
-
-#frame {
-	color: #fff;
-	position: absolute;
-	top: 140px;
-	left: 10px;
-}
-
-#space {
-	width: 85px !important;
-	position: relative;
-	top: 33px;
-	left: -124px;
-}
-
-#time {
-	position: absolute;
-	top: 180px;
-	left: 10px;
-	color: #fff;
-}
-
-#fps {
-	position: absolute;
-	top: 160px;
-	left: 10px;
-	color: #fff;
-}
-
-.hidden {
-	display: none;
+    color: var(--text);
+    position: absolute;
+    top: 10px;
+    left: 300px;
 }
 
 .top {
-	position: absolute;
-	top: 10px;
-	left: 10px;
-	display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: inline-block;
 }
 
-label {
-	color: #fff;
+#debug {
+    width: 150px;
+    height: 220px;
+    background-color: var(--panel);
+}
+
+#keys {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+}
+
+#keys h3 {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    display: inline-block;
+    color: var(--text);
+    border: 1px solid var(--text);
+    padding: 3px;
+    border-radius: 3px;
+    padding: 2px;
+}
+
+#w {
+    position: relative;
+    top: -32px;
+    left: -61px;
+}
+
+#frame {
+    color: var(--text);
+    position: absolute;
+    top: 140px;
+    left: 10px;
+}
+
+#space {
+    width: 85px !important;
+    position: relative;
+    top: 33px;
+    left: -124px;
+}
+
+#time {
+    position: absolute;
+    top: 180px;
+    left: 10px;
+    color: var(--text);
+}
+
+#fps {
+    position: absolute;
+    top: 160px;
+    left: 10px;
+    color: var(--text);
+}
+
+.hidden {
+    display: none;
+}
+
+.highlight {
+    color: var(--player) !important;
+    border-color: var(--player) !important;
+    /* Glow Effect! WOOO! */
+    box-shadow: 0px 0px 5px 5px var(--tran);
 }
 
 .bullet {
-	height: 5px;
-	width: 5px;
-	background-color: #ff0;
-	border-radius: 50%;
+    height: 5px;
+    width: 5px;
+    background-color: var(--bullet);
+    border-radius: 50%;
+}
+
+label {
+    color: var(--text);
 }
