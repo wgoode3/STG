@@ -1,19 +1,29 @@
-/* Game constants to play around with */
-const target_frame_time = 16;
-const accel = 3;
-const deccel = 6; 
-const speed = 12;
-const size = 25;
-const bullet_speed = 24;
-const cooldown_timer = 5;
+/* Prevent accidental refresh */
+window.onbeforeunload = function () {
+    return false;
+}
 
 /* Set the playfield to be the window size */
-let borders = {
+const borders = {
     'width': window.innerWidth,
     'height': window.innerHeight 
 }
 
-let player = {
+/* Enemy Move Patterns */
+const paths = {
+    'rtl': {
+        'spawn': {
+            x: borders.width + 50,
+            y: 100
+        },
+        'velocity': {
+            vx:-5,
+            vy:-1
+        }
+    }
+}
+
+const player = {
     'position': {
         'x': borders.width/2,
         'y': borders.height/2
@@ -21,17 +31,7 @@ let player = {
     'power': 'single'
 }
 
-let keyMap = {
-    'w': false,
-    'a': false,
-    's': false,
-    'd': false,
-    'space': false
-}
-
 let paused = false;
-let bullets = [];
-let items = [];
 
 /* Item class - items have position and a value */
 function Item(x, y, value){
@@ -48,6 +48,15 @@ function Bullet(x, y, vx, vy){
     this.vy = vy;
 }
 
+/* Enemy class - has position and health */
+function Enemy(x, y, hp, type, path){
+    this.x = x;
+    this.y = y;
+    this.hp = hp;
+    this.type = type;
+    this.path = path;
+}
+
 /* Make some items to test them out */
 function genItems(){
     items.push(
@@ -58,125 +67,34 @@ function genItems(){
 }
 genItems();
 
-/* Prevent accidental refresh */
-window.onbeforeunload = function () {
-    return false;
+/* Make an enemy to display */
+function spawnEnemies(){
+    enemies.push(new Enemy(0.5*borders.width, 0.15*borders.height, 10, "", 'rtl'));
 }
-
-/* Game Loop, runs all te game logic in a set interval */
-function gameLoop(){
-    if (!document.hasFocus() && !paused ){
-        pause();
-    }
-    if (!paused) {
-        frameTime();
-        movePlayer();
-        pickUpItem();
-        fire();
-        moveBullets();
-    }
-    highlightKeys();
-}
-setInterval(gameLoop, target_frame_time);
-
-/* Kind of displays performance information */
-let frame = 0;
-let prev_time = Date.now();
-function frameTime(){
-    let t = Date.now();
-    let time_delta = t - prev_time;
-    prev_time = t;
-    let fps = `${1000/time_delta}`;
-    if (fps.length > 2) {
-        fps = fps.substring(0,4);
-    }
-    document.getElementById("frame").innerHTML = `frame: ${frame++}`;
-    document.getElementById("time").innerHTML = `frame time: ${time_delta}`;
-    document.getElementById("fps").innerHTML = `fps: ${fps}`;
-}
-
-/* Shows which keys are pressed */
-function highlightKeys(){
-    if (keyMap.a) {
-        document.getElementById("a").classList.add('highlight');
-    } else {
-        document.getElementById("a").classList.remove('highlight');
-    }
-    if (keyMap.d) {
-        document.getElementById("d").classList.add('highlight');
-    } else {
-        document.getElementById("d").classList.remove('highlight');
-    }
-    if (keyMap.w) {
-        document.getElementById("w").classList.add('highlight');
-    } else {
-        document.getElementById("w").classList.remove('highlight');
-    }
-    if (keyMap.s) {
-        document.getElementById("s").classList.add('highlight');
-    } else {
-        document.getElementById("s").classList.remove('highlight');
-    }
-    if (keyMap.space) {
-        document.getElementById("space").classList.add('highlight');
-    } else {
-        document.getElementById("space").classList.remove('highlight');
-    }
-}
-
-/* Detects pressing a key */
-document.onkeydown = function(a){
-    if (a.keyCode == 65) {
-        keyMap.a = true;
-    }
-    if (a.keyCode == 68) {
-        keyMap.d = true;
-    } 
-    if (a.keyCode == 87) {
-        keyMap.w = true;
-    }
-    if (a.keyCode == 83) {
-        keyMap.s = true;
-    }
-    if (a.keyCode == 32) {
-        keyMap.space = true;
-    }
-    if (a.keyCode == 80) {
-        pause();
-    }
-}
-
-/* Detects key being lifted */
-document.onkeyup = function(a){
-    if (a.keyCode == 65) {
-        keyMap.a = false;
-    }
-    if (a.keyCode == 68) {
-        keyMap.d = false;
-    } 
-    if (a.keyCode == 87) {
-        keyMap.w = false;
-    }
-    if (a.keyCode == 83) {
-        keyMap.s = false;
-    }
-    if (a.keyCode == 32) {
-        keyMap.space = false;
-    }
-}
+spawnEnemies();
 
 /* Moves the player around */
 let delta = {x:0, y:0};
 // let prev_delta = delta;
 function movePlayer(){
 
-    if (keyMap.a) { delta.x -= accel; }
-    if (keyMap.d) { delta.x += accel; }
-    if (keyMap.w) { delta.y -= accel; }
-    if (keyMap.s) { delta.y += accel; }
+    keyMap.focus ? speed = 4: speed = 8;
+
+    if (keyMap.left) { 
+        delta.x -= accel; 
+    }
+    if (keyMap.right) { 
+        delta.x += accel; 
+    }
+    if (keyMap.up) { 
+        delta.y -= accel; 
+    }
+    if (keyMap.down) { 
+        delta.y += accel; 
+    }
 
     /* if not moving left or right then slow down */
-    if (!keyMap.a && !keyMap.d) {
+    if (!keyMap.left && !keyMap.right) {
         if (delta.x > 0) {
             delta.x -= deccel;
         } else if (delta.x < 0) {
@@ -185,7 +103,7 @@ function movePlayer(){
     }
 
     /* if not moving up or down then slow down */
-    if (!keyMap.w && !keyMap.s) {
+    if (!keyMap.up && !keyMap.down) {
         if (delta.y > 0) {
             delta.y -= deccel;
         } else if (delta.y < 0) {
@@ -195,16 +113,16 @@ function movePlayer(){
 
     /* only `accel` up to `speed` */
     if (Math.abs(delta.x) > speed) {
-        delta.x > 0 ? delta.x = speed: delta.x = -speed;
+        delta.x > speed ? delta.x = speed: delta.x = -speed;
     }
     if (Math.abs(delta.y) > speed) {
-        delta.y > 0 ? delta.y = speed: delta.y = -speed;
+        delta.y > speed ? delta.y = speed: delta.y = -speed;
     }
 
     /* make diagonals move same speed as cardinal directions */
     if (Math.abs(delta.x) + Math.abs(delta.y) >= 2*speed) {
-        delta.x *= 0.71; // (2^-2)/2
-        delta.y *= 0.71; // (2^-2)/2
+        delta.x *= Math.sqrt(2)/2;
+        delta.y *= Math.sqrt(2)/2;
     }
 
     /* if the speed is close to zero make it zero */
@@ -254,11 +172,11 @@ function fire(){
     function spread(){
         bullets.push(
             new Bullet(player.position.x + 10, player.position.y + 10, 0, -bullet_speed), 
-            new Bullet(player.position.x + 10, player.position.y + 10, 2, -bullet_speed), 
-            new Bullet(player.position.x + 10, player.position.y + 10, -2, -bullet_speed)
+            new Bullet(player.position.x + 10, player.position.y + 10, 1, -bullet_speed), 
+            new Bullet(player.position.x + 10, player.position.y + 10, -1, -bullet_speed)
         );
     }
-    if (keyMap.space) { 
+    if (keyMap.shoot) { 
         if (cooldown <= 0){
             if (player.power === 'single') {
                 single();
@@ -295,8 +213,8 @@ function checkBounds(dimension, bound, delta){
     return pos < bound && pos > 0;
 }
 
-/* Displays the items in items */
-function displayItem(){
+/* Displays the items */
+function displayItems(){
     let output = '';
     for(let i=0; i<items.length; i++){
         let colors = {
@@ -308,7 +226,33 @@ function displayItem(){
     }
     document.getElementById("items").innerHTML = output;
 }
-displayItem();
+displayItems();
+
+/* Display the enemies */
+function displayEnemies(){
+    let output = ''
+    for(let i=0; i<enemies.length; i++){
+        output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`
+    }
+    document.getElementById("enemies").innerHTML = output;
+}
+
+function detectBulletCollisions(){
+    for(let i=0; i<enemies.length; i++){
+        for(let j=0; j<bullets.length; j++){
+            let ex = enemies[i].x;
+            let bx = bullets[j].x;
+            if (ex-10 < bx && ex+30 > bx) {
+                let ey = enemies[i].y
+                let by = bullets[j].y
+                if (ey-30 < by && ey+30 > by) {
+                    console.log("hit!");
+                    bullets.splice(j, 1);
+                }
+            } 
+        }
+    }
+}
 
 /* Allows the user to pick up an item */
 function pickUpItem(){
@@ -321,30 +265,37 @@ function pickUpItem(){
             if (iy-20 < py && iy+20 > py) {
                 player.power = items[i].value;
                 items.splice(i, 1);
-                displayItem();
+                displayItems();
             }
         }
-    }
-}
-
-/* Show the debug section if the checkbox is checked */
-function debug(){
-    let active = document.getElementById("debug-select").checked;
-
-    if (active) {
-        document.getElementById("debug").classList.remove('hidden');
-    } else {
-        document.getElementById("debug").classList.add('hidden');
     }
 }
 
 /* Pauses the game */
 function pause(){
     paused = !paused;
-    document.getElementById("pause").style["left"] = `${borders.width - 250}px`;
+    document.getElementById("pauseOverlay").style["left"] = `${borders.width - 250}px`;
     if (paused) {
-        document.getElementById("pause").classList.remove('hidden');
+        document.getElementById("pauseOverlay").classList.remove('hidden');
     } else {
-        document.getElementById("pause").classList.add('hidden');
+        document.getElementById("pauseOverlay").classList.add('hidden');
     }
 }
+
+/* Game Loop, runs all te game logic in a set interval */
+function gameLoop(){
+    if (!document.hasFocus() && !paused ){
+        pause();
+    }
+    if (!paused) {
+        frameTime();
+        movePlayer();
+        pickUpItem();
+        fire();
+        moveBullets();
+        displayEnemies();
+        detectBulletCollisions();
+    }
+    highlightKeys();
+}
+setInterval(gameLoop, target_frame_time);

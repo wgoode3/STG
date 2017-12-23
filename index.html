@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Move</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
@@ -11,15 +12,16 @@
 <div id="player"></div>
 <div id="bullets"></div>
 <div id="items"></div>
+<div id="enemies"></div>
 
 <!-- Select the debug -->
 <div class="top">
-    <input type="checkbox" id="debug-select" checked="true" onchange="debug();">
+    <input type="checkbox" id="debug-select" onchange="debug();">
     <label for="debug-select">Debug</label>
 </div>
 
 <!-- Pause screen overlay -->
-<div id="pause" class="hidden">
+<div id="pauseOverlay" class="hidden">
     <h1>Paused</h1>
     <h3>Press "P" to unpause</h3>
 </div>
@@ -27,18 +29,24 @@
 <!-- Debug overlay -->
 <div id="debug">
     <div id="keys">
-        <h3 id="a">A</h3>
-        <h3 id="s">S</h3>
-        <h3 id="d">D</h3>
-        <h3 id="w">W</h3>
-        <h3 id="space">SPACE</h3>
+        <h3 id="left">◀</h3>
+        <h3 id="down">▼</h3>
+        <h3 id="right">▶</h3>
+        <h3 id="up">▲</h3>
+        <h3 id="shoot">Z</h3>
+        <h3 id="bomb">X</h3>
+        <h3 id="pause">P</h3>
+        <h3 id="focus">Shift</h3>
     </div>
     <h3 id="frame">frame: 0</h3>
-    <h3 id="time">time: </h3>
-    <h3 id="fps">fps: </h3>
+    <h3 id="time">time: 0</h3>
+    <h3 id="fps">fps: 0</h3>
 </div>
 
-<!-- Load up the game script -->
+<!-- Load up the game scripts -->
+<script type="text/javascript" src="js/constants.js"></script>
+<script type="text/javascript" src="js/debug.js"></script>
+<script type="text/javascript" src="js/controls.js"></script>
 <script type="text/javascript" src="js/game.js"></script>
 
 </body>

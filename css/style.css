@@ -15,9 +15,11 @@
     /* Orange Powerup */
     --orange: rgba(255, 165, 0, .8);
     /* Cyan Powerup */
-    --green: rgba(0, 255, 255, .8);
+    --cyan: rgba(0, 255, 255, .8);
     /* Green Powerup */
-    --cyan: rgba(0, 255, 0, .8);
+    --green: rgba(0, 255, 0, .8);
+    /* Purple Enemy */
+    --purple: rgba(153, 102, 255, .8);
 }
 
 /* CSS reset */
@@ -40,7 +42,7 @@ body {
     position: absolute;
 } 
 
-#pause {
+#pauseOverlay {
     color: var(--text);
     position: absolute;
     top: 10px;
@@ -50,20 +52,20 @@ body {
 .top {
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 25px;
     display: inline-block;
 }
 
 #debug {
-    width: 150px;
-    height: 220px;
+    width: 180px;
+    height: 250px;
     background-color: var(--panel);
 }
 
 #keys {
     position: absolute;
-    top: 70px;
-    left: 10px;
+    top: 68px;
+    left: 25px;
 }
 
 #keys h3 {
@@ -78,36 +80,54 @@ body {
     padding: 2px;
 }
 
-#w {
+#up {
     position: relative;
     top: -32px;
     left: -61px;
 }
 
+#shoot {
+    position: relative;
+    top: 33px;
+    left: -122px;
+}
+
+#bomb {
+    position: relative;
+    top: 33px;
+    left: -122px;
+}
+
+#pause {
+    position: relative;
+    top: 33px;
+    left: -122px;
+}
+
+#focus {
+    width: 80px !important;
+    position: relative;
+    top: 64px;
+    left: -212px;
+}
+
 #frame {
     color: var(--text);
     position: absolute;
-    top: 140px;
+    top: 165px;
     left: 10px;
-}
-
-#space {
-    width: 85px !important;
-    position: relative;
-    top: 33px;
-    left: -124px;
-}
-
-#time {
-    position: absolute;
-    top: 180px;
-    left: 10px;
-    color: var(--text);
 }
 
 #fps {
     position: absolute;
-    top: 160px;
+    top: 185px;
+    left: 10px;
+    color: var(--text);
+}
+
+#time {
+    position: absolute;
+    top: 205px;
     left: 10px;
     color: var(--text);
 }
@@ -134,6 +154,13 @@ body {
     width: 25px;
     height: 25px;
     border-radius: 50%;
+}
+
+.enemy {
+    width: 25px;
+    height: 25px;
+    background-color: var(--purple);
+    transform: rotate(45deg);
 }
 
 label {
