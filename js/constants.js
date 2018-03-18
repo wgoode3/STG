@@ -30,10 +30,18 @@ const upKey    = 38, // up arrow
 const rate = 5;
 
 /* Set the playfield to be the window size */
+// const borders = {
+//     'width': window.innerWidth,
+//     'height': window.innerHeight 
+// }
+/* Set the playfield to be size of the div with id="field" */
 const borders = {
-    'width': window.innerWidth,
-    'height': window.innerHeight 
+    'width': document.getElementById("field").clientWidth,
+    'height': document.getElementById("field").clientHeight 
 }
+
+/* number of leaves based on screen size */
+const numLeaves = borders.width * borders.height / 25000 >> 0;
 
 /* Player position and current power */
 const player = {

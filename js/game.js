@@ -59,7 +59,7 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x > enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot += randInt(250);
+                enemies[i].spot += randInt(500);
             }
         }else if(enemies[i].path == "r-l" || enemies[i].path == "tr-lb"){
             // right to left
@@ -76,7 +76,7 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x < enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot -= randInt(250);
+                enemies[i].spot -= randInt(500);
             }
         }else if(enemies[i].path == "t-p"){
             // top to player, bonzai charge fairy
@@ -90,7 +90,7 @@ function moveEnemies(){
             enemies[i].y += (Dy/distance)*fairySpeed;
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].state-- <= 0){
-                enemies[i].state = randInt(200);
+                enemies[i].state = randInt(100);
                 enemies[i].shoot();
             }
             if(enemies[i].hp <= 0){
@@ -110,7 +110,7 @@ Enemy.prototype.shoot = function(){
 
     if(Math.random() > 0.5){
         // direct shot
-        let bulletSpeed = 6;
+        let bulletSpeed = 8;
         let px = player.position.x;
         let py = player.position.y;
         let Dx = px-this.x;
@@ -118,14 +118,18 @@ Enemy.prototype.shoot = function(){
         let distance = Math.pow((Math.pow(Dx, 2) + Math.pow(Dy, 2)), 0.5)
         let vx = (Dx/distance)*bulletSpeed;
         let vy = (Dy/distance)*bulletSpeed;
-        enemyBullets.push(new Bullet(this.x, this.y, vx, vy, "bullet1"))
+        enemyBullets.push(new Bullet(this.x, this.y, vx, vy, "bullet1"));
+        enemyBullets.push(new Bullet(this.x, this.y, vx*0.9, vy*0.9, "bullet1"));
+        enemyBullets.push(new Bullet(this.x, this.y, vx*0.8, vy*0.8, "bullet1"));
+        enemyBullets.push(new Bullet(this.x, this.y, vx*0.7, vy*0.7, "bullet1"));
+        enemyBullets.push(new Bullet(this.x, this.y, vx*0.6, vy*0.6, "bullet1"));
     }else{
         // curtain shot
         enemyBullets.push(new Bullet(this.x, this.y, 0, 2.5, "bullet2"));
-        enemyBullets.push(new Bullet(this.x, this.y, 2.25, 1, "bullet2"));
-        enemyBullets.push(new Bullet(this.x, this.y, -2.25, 1, "bullet2")); 
-        enemyBullets.push(new Bullet(this.x, this.y, 1, -2, "bullet2"));   
-        enemyBullets.push(new Bullet(this.x, this.y, -1, -2, "bullet2"));   
+        enemyBullets.push(new Bullet(this.x, this.y, 1.5, 2, "bullet2"));
+        enemyBullets.push(new Bullet(this.x, this.y, -1.5, 2, "bullet2")); 
+        enemyBullets.push(new Bullet(this.x, this.y, 0.75, 2.4, "bullet2"));   
+        enemyBullets.push(new Bullet(this.x, this.y, -0.75, 2.4, "bullet2"));   
     }
 }
 
@@ -171,13 +175,13 @@ function spawnEnemies(){
         for(var i=0; i<wave["size"]; i++){
             if(wave["path"] == "l-r" || wave["path"] == "tl-rb"){
                 var x = wave["x"] - i*wave["offset"];
-                var state = randInt(80);
+                var state = randInt(100);
             }else if(wave["path"] == "r-l" || wave["path"] == "tr-lb"){
                 var x = wave["x"] + i*wave["offset"] + borders.width;
-                var state = randInt(80);
+                var state = randInt(100);
             }else if(wave["path"] == "t-p"){
                 var x = borders.width / 2 >> 0;
-                var state = randInt(200);
+                var state = randInt(100);
             }
             enemies.push(
                 new Enemy(
@@ -212,8 +216,6 @@ function randInt(num){
     return Math.floor(Math.random()*(num))+1;
 }
 
-/* number of leaves based on screen size */
-const numLeaves = borders.width * borders.height / 25000 >> 0;
 /* Make some leaves! */
 function genLeaves(){
     while(leaves.length < numLeaves){
@@ -511,7 +513,7 @@ function pause(){
 /* Make the background appear to be moving */
 let start = 0;
 function scrollBackground(){
-    document.querySelector("body").style.backgroundPosition = `0px ${start}px`;
+    document.getElementById("field").style.backgroundPosition = `0px ${start}px`;
     start < 450 ? start+=1 : start=0;
 }
 
@@ -570,19 +572,20 @@ function difficulty(){
 var hit = new Audio('sound/effects/84803__djahren__plastic-bang.mp3');
 
 /* plays the BGM on a loop */
-var audio = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
-audio.play();
-audio.volume = 0.5;
+var bgm = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
+bgm.play();
+bgm.loop = true;
+bgm.volume = 0.5;
 
 /* allows pausing the bgm */
 var is_playing = true;
 var audioPause = document.getElementById("audio-pause");
 audioPause.addEventListener("click", function(){
     if(is_playing){
-        audio.pause();
+        bgm.pause();
         audioPause.innerHTML = "▶";
     }else{
-        audio.play();
+        bgm.play();
         audioPause.innerHTML = "⏸";
     }
     is_playing = !is_playing;
