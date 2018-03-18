@@ -186,9 +186,9 @@ body {
 }
 
 .enemy {
-    background: url('../img/sprites/momiji.png') 84px -5px;
-    height: 83px;
-    width: 83px;
+    background: url('../img/sprites/momiji.png') 75px -5px;
+    height: 70px;
+    width: 70px;
 }
 
 label {

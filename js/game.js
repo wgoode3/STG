@@ -1,7 +1,7 @@
 /* Prevent accidental refresh */
-window.onbeforeunload = function () {
-    return false;
-}
+// window.onbeforeunload = function () {
+//     return false;
+// }
 
 /* Set the playfield to be the window size */
 const borders = {
