@@ -161,20 +161,20 @@ body {
     box-shadow: 0px 0px 5px 5px var(--tran);
 }
 
-/*.bullet {
-    background: url('../img/sprites/momiji.png') 92px 98px;
-    height: 24px;
-    width: 20px;
-}*/
-
 .bullet {
     background: url('../img/sprites/momiji.png') 20px 98px;
     height: 24px;
     width: 24px;
 }
 
-.enemy-bullet {
+.bullet1 {
     background: url('../img/sprites/momiji.png') 39px 94px;
+    height: 17px;
+    width: 17px;
+}
+
+.bullet2 {
+    background: url('../img/sprites/momiji.png') 65px 94px;
     height: 17px;
     width: 17px;
 }

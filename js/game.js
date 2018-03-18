@@ -11,11 +11,12 @@ function Item(x, y, value){
 }
 
 /* Bullet class - bullets have position and speed */
-function Bullet(x, y, vx, vy){
+function Bullet(x, y, vx, vy, type){
     this.x = x;
     this.y = y;
     this.vx = vx;
     this.vy = vy;
+    this.type = type;
 }
 
 /* Enemy class - has position and health */
@@ -117,14 +118,14 @@ Enemy.prototype.shoot = function(){
         let distance = Math.pow((Math.pow(Dx, 2) + Math.pow(Dy, 2)), 0.5)
         let vx = (Dx/distance)*bulletSpeed;
         let vy = (Dy/distance)*bulletSpeed;
-        enemyBullets.push(new Bullet(this.x, this.y, vx, vy))
+        enemyBullets.push(new Bullet(this.x, this.y, vx, vy, "bullet1"))
     }else{
         // curtain shot
-        enemyBullets.push(new Bullet(this.x, this.y, 0, 2.5));
-        enemyBullets.push(new Bullet(this.x, this.y, 2, 1));
-        enemyBullets.push(new Bullet(this.x, this.y, -2, 1)); 
-        enemyBullets.push(new Bullet(this.x, this.y, 1, -2));   
-        enemyBullets.push(new Bullet(this.x, this.y, -1, -2));   
+        enemyBullets.push(new Bullet(this.x, this.y, 0, 2.5, "bullet2"));
+        enemyBullets.push(new Bullet(this.x, this.y, 2.25, 1, "bullet2"));
+        enemyBullets.push(new Bullet(this.x, this.y, -2.25, 1, "bullet2")); 
+        enemyBullets.push(new Bullet(this.x, this.y, 1, -2, "bullet2"));   
+        enemyBullets.push(new Bullet(this.x, this.y, -1, -2, "bullet2"));   
     }
 }
 
@@ -137,7 +138,7 @@ function moveEnemyBullets(){
         } else if (enemyBullets[i].x < 0 || enemyBullets[i].x + 10 > borders.width) {
             enemyBullets.splice(i, 1);
         } else {
-            output += `<div class="enemy-bullet" style="position:absolute;top:${enemyBullets[i].y+=enemyBullets[i].vy}px;left:${enemyBullets[i].x+=enemyBullets[i].vx}px;"></div>`;
+            output += `<div class="${enemyBullets[i].type}" style="position:absolute;top:${enemyBullets[i].y+=enemyBullets[i].vy}px;left:${enemyBullets[i].x+=enemyBullets[i].vx}px;"></div>`;
         }
     }
     document.getElementById("enemy-bullets").innerHTML = output;
@@ -326,29 +327,29 @@ function fire(){
     /* Starting power */
     function single(){
         bullets.push(
-            new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed)
+            new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed, "bullet")
         );
     }
     /* Shoots two bullets */
     function double(){
         bullets.push(
-            new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, 0, -bullet_speed), 
-            new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 0, -bullet_speed)
+            new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, 0, -bullet_speed, "bullet"), 
+            new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 0, -bullet_speed, "bullet")
         );
     }
     /* Shoots in a spread pattern */
     function spread(){
         if(keyMap["focus"]){
             bullets.push(
-                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed), 
-                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -0.5, -bullet_speed), 
-                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 0.5, -bullet_speed)
+                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed, "bullet"), 
+                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -0.5, -bullet_speed, "bullet"), 
+                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 0.5, -bullet_speed, "bullet")
             );
         }else{
             bullets.push(
-                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed), 
-                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -2, -bullet_speed), 
-                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 2, -bullet_speed)
+                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed, "bullet"), 
+                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -2, -bullet_speed, "bullet"), 
+                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 2, -bullet_speed, "bullet")
             );
         }
     }
@@ -566,8 +567,7 @@ function difficulty(){
 }
 
 /* sound effects */
-var hit = new Audio('sound/effects/160760__cosmicembers__object-hit.mp3');
-var shot = new Audio('sound/effects/263595__porkmuncher__swoosh.mp3');
+var hit = new Audio('sound/effects/84803__djahren__plastic-bang.mp3');
 
 /* plays the BGM on a loop */
 var audio = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
@@ -590,6 +590,6 @@ audioPause.addEventListener("click", function(){
 
 function volume(){
     let v = document.getElementById("volume").value;
-    audio.volume = 0.5;
+    audio.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }
