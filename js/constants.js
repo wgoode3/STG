@@ -1,13 +1,19 @@
 /* Game constants to play around with */
 const target_frame_time = 16,
-      accel             = 2,
-      deccel            = 4, 
+      accel             = 4,
+      deccel            = 8, 
       size              = 25,
       bullet_speed      = 16,
-      cooldown_timer    = 5,
+      cooldown_timer    = 8,
       bullets           = [],
       items             = [],
-      enemies           = [];
+      enemies           = [],
+      enemyBullets      = [],
+      leaves            = [];
+
+/* Player offset */
+const player_height = 150,
+      player_width  = 110;
 
 /* Key Bindings */
 const upKey    = 38, // up arrow
@@ -23,4 +29,7 @@ const upKey    = 38, // up arrow
 const rate = 5;
 
 /* Speed can change based on focus mode */
-let speed = 8;
+let speed = 16;
+
+/* Fairies defeated */
+let count = 0;

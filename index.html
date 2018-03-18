@@ -7,17 +7,17 @@
 </head>
 <body>
 
-<!-- Elements on the screen -->
-<div id="field"></div>
-<div id="player"></div>
-<div id="bullets"></div>
-<div id="items"></div>
-<div id="enemies"></div>
-
 <!-- Select the debug -->
 <div class="top">
-    <input type="checkbox" id="debug-select" onchange="debug();">
+    <input type="checkbox" id="debug-select" onchange="debug();" style="display: inline;">
     <label for="debug-select">Debug</label>
+</div>
+
+<div id="top-right">
+    <p>
+        <span id="audio-pause">⏸</span>
+        [08] Fall of Fall ~ Akimeku Taki.mp3
+    </p>
 </div>
 
 <!-- Pause screen overlay -->
@@ -42,6 +42,18 @@
     <h3 id="time">time: 0</h3>
     <h3 id="fps">fps: 0</h3>
 </div>
+
+<!-- Elements on the screen -->
+<div id="field"></div>
+<div id="player"></div>
+<div id="bullets"></div>
+<div id="items"></div>
+<div id="enemies"></div>
+<div id="enemy-bullets"></div>
+<div id="leaves"></div>
+
+
+<div id="hitbox"></div>
 
 <!-- Load up the game scripts -->
 <script type="text/javascript" src="js/constants.js"></script>

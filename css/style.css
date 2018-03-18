@@ -20,32 +20,50 @@
     --green: rgba(0, 255, 0, .8);
     /* Purple Enemy */
     --purple: rgba(153, 102, 255, .8);
+    /* Hitbox Red */
+    --red: rgba(255, 0, 0, .5);
 }
 
 /* CSS reset */
 * {
     margin: 0px;
     padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
     background-color: var(--field);
+    background: url("../background/autumn-forest-tile.jpg") 0px 0px;
+    position: absolute;
+    overflow: hidden;
 }
 
 #player {
-    width: 0;
-    height: 0;
-    border-left: 12px solid transparent;
-    border-right: 12px solid transparent;
-    border-bottom: 20px solid var(--player);
-    position: absolute;
+    background: url('../momiji/sprites.png') 0px 0px;
+    width:110px;
+    height:150px;
+    position:absolute;
 } 
+
+#top-right {
+    position: fixed; 
+    top: 10px;
+    right: 10px;
+    display: inline;
+    color: #fff;
+}
+
+#audio-pause{
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
 
 #pauseOverlay {
     color: var(--text);
     position: absolute;
-    top: 10px;
+    top: 50px;
     left: 300px;
 }
 
@@ -88,27 +106,27 @@ body {
 
 #shoot {
     position: relative;
-    top: 33px;
+    top: 32px;
     left: -122px;
 }
 
 #bomb {
     position: relative;
-    top: 33px;
-    left: -122px;
+    top: 6px;
+    left: 32px;
 }
 
 #pause {
     position: relative;
-    top: 33px;
-    left: -122px;
+    top: 6px;
+    left: 32px;
 }
 
 #focus {
     width: 80px !important;
     position: relative;
-    top: 64px;
-    left: -212px;
+    top: 36px;
+    left: -60px;
 }
 
 #frame {
@@ -144,10 +162,21 @@ body {
 }
 
 .bullet {
-    height: 5px;
-    width: 5px;
-    background-color: var(--bullet);
-    border-radius: 50%;
+    background: url('../momiji/sprites.png') 65px 94px;
+    height: 17px;
+    width: 17px;
+}
+
+.enemy-bullet {
+    background: url('../momiji/sprites.png') 39px 94px;
+    height: 17px;
+    width: 17px;
+}
+
+.leaf {
+    background: url('../momiji/sprites.png') -60px 40px;
+    height: 30px;
+    width: 30px;
 }
 
 .item {
@@ -157,12 +186,18 @@ body {
 }
 
 .enemy {
-    width: 25px;
-    height: 25px;
-    background-color: var(--purple);
-    transform: rotate(45deg);
+    background: url('../momiji/sprites.png') 84px -5px;
+    height: 83px;
+    width: 83px;
 }
 
 label {
     color: var(--text);
+}
+
+.hitbox {
+    background-color: var(--red);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
 }
