@@ -18,12 +18,8 @@
         <span id="audio-pause">⏸</span>
         [08] Fall of Fall ~ Akimeku Taki.mp3
     </p>
-</div>
-
-<!-- Pause screen overlay -->
-<div id="pauseOverlay" class="hidden">
-    <h1>Paused</h1>
-    <h3>Press "P" to unpause</h3>
+    <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5" onchange="volume();">
+    <label id="volume%">50%</label>
 </div>
 
 <!-- Debug overlay -->
@@ -45,13 +41,19 @@
 
 <!-- Elements on the screen -->
 <div id="field"></div>
+<div id="leaves"></div>
 <div id="player"></div>
 <div id="bullets"></div>
 <div id="items"></div>
 <div id="enemies"></div>
 <div id="enemy-bullets"></div>
-<div id="leaves"></div>
 <div id="hitbox"></div>
+
+<!-- Pause screen overlay -->
+<div id="pauseOverlay" class="hidden">
+    <h1>Paused</h1>
+    <h3>Press "P" to unpause</h3>
+</div>
 
 <!-- Load up the game scripts -->
 <script type="text/javascript" src="js/constants.js"></script>

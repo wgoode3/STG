@@ -3,7 +3,8 @@ const target_frame_time = 16,
       accel             = 4,
       deccel            = 8, 
       size              = 25,
-      bullet_speed      = 16,
+      bullet_speed      = 12,
+      angular_velocity  = 15,
       cooldown_timer    = 8,
       bullets           = [],
       items             = [],
@@ -43,11 +44,20 @@ const player = {
     'power': 'spread'
 }
 
+/* Max player speed */
+let top_speed = 8;
+
 /* Speed can change based on focus mode */
-let speed = 16;
+let speed = 8;
 
 /* Fairies defeated */
 let count = 0;
+
+/* Delay between waves */
+let delay_constant = 400;
+
+/* Wave size */
+let wave_size = 12;
 
 /* tells if the game is paused */
 let paused = false;

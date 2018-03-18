@@ -19,7 +19,7 @@ function Bullet(x, y, vx, vy){
 }
 
 /* Enemy class - has position and health */
-function Enemy(x, y, vx, vy, hp, type, path, spot){
+function Enemy(x, y, vx, vy, hp, type, path, spot, state){
     this.x = x;
     this.y = y;
     this.vx = vx;
@@ -28,6 +28,7 @@ function Enemy(x, y, vx, vy, hp, type, path, spot){
     this.type = type;
     this.path = path;
     this.spot = spot;
+    this.state = state;
 }
 
 /* Purely cosmetic leaves */
@@ -46,6 +47,8 @@ function moveEnemies(){
             // left to right
             enemies[i].x += enemies[i].vx
             enemies[i].y += enemies[i].vy
+            enemies[i].y += 0.5*Math.floor(Math.cos(enemies[i].state++*(Math.PI/40)));
+            enemies[i].state = enemies[i].state % 80;
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
                 hit.play();
@@ -55,12 +58,14 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x > enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot += 150;
+                enemies[i].spot += randInt(250);
             }
         }else if(enemies[i].path == "r-l" || enemies[i].path == "tr-lb"){
             // right to left
             enemies[i].x += enemies[i].vx
             enemies[i].y += enemies[i].vy
+            enemies[i].y += 0.5*Math.floor(Math.cos(enemies[i].state++*(Math.PI/40)));
+            enemies[i].state = enemies[i].state % 80;
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
                 hit.play();
@@ -70,10 +75,29 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x < enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot -= 150;
+                enemies[i].spot -= randInt(250);
             }
         }else if(enemies[i].path == "t-p"){
-            // top to player
+            // top to player, bonzai charge fairy
+            let fairySpeed = 4;
+            let px = player.position.x;
+            let py = player.position.y;
+            let Dx = px-enemies[i].x;
+            let Dy = py-enemies[i].y;
+            let distance = Math.pow((Math.pow(Dx, 2) + Math.pow(Dy, 2)), 0.5)
+            enemies[i].x += (Dx/distance)*fairySpeed;
+            enemies[i].y += (Dy/distance)*fairySpeed;
+            output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
+            if(enemies[i].state-- <= 0){
+                enemies[i].state = randInt(200);
+                enemies[i].shoot();
+            }
+            if(enemies[i].hp <= 0){
+                hit.play();
+                enemies.splice(i, 1);
+                count++
+            }
+
         }
     }
     document.getElementById("enemies").innerHTML = output;
@@ -96,7 +120,7 @@ Enemy.prototype.shoot = function(){
         enemyBullets.push(new Bullet(this.x, this.y, vx, vy))
     }else{
         // curtain shot
-        enemyBullets.push(new Bullet(this.x, this.y, 0, 3));
+        enemyBullets.push(new Bullet(this.x, this.y, 0, 2.5));
         enemyBullets.push(new Bullet(this.x, this.y, 2, 1));
         enemyBullets.push(new Bullet(this.x, this.y, -2, 1)); 
         enemyBullets.push(new Bullet(this.x, this.y, 1, -2));   
@@ -122,37 +146,45 @@ function moveEnemyBullets(){
 /* queues up various types of enemy attack waves */
 const waves = [
     {
-        "size": 10, "type": "fairy", "path": "l-r", "hp": 3, "vx": 4, "vy": 0, "x": -50, "y": 150, "offset": 200, "spot": 150
+        "size": 10, "type": "fairy", "path": "l-r", "hp": 3, "vx": 4, "vy": 0, "x": -50, "y": 150, "offset": 200, "spot": randInt(150)
     },
     {
-        "size": 10, "type": "fairy", "path": "r-l", "hp": 3, "vx": -4, "vy": 0, "x": 50, "y": 150, "offset": 200, "spot": borders.width - 150
+        "size": 10, "type": "fairy", "path": "r-l", "hp": 3, "vx": -4, "vy": 0, "x": 50, "y": 150, "offset": 200, "spot": borders.width - randInt(150)
     },
     {
-        "size": 8, "type": "fairy", "path": "tl-rb", "hp": 3, "vx": 5, "vy": 1, "x": -50, "y": 50, "offset": 150, "spot": 150
+        "size": 8, "type": "fairy", "path": "tl-rb", "hp": 3, "vx": 5, "vy": 1, "x": -50, "y": 50, "offset": 150, "spot": randInt(150)
     },
     {
-        "size": 8, "type": "fairy", "path": "tr-lb", "hp": 3, "vx": -5, "vy": 1, "x": 50, "y": 50, "offset": 150, "spot": borders.width - 150
+        "size": 8, "type": "fairy", "path": "tr-lb", "hp": 3, "vx": -5, "vy": 1, "x": 50, "y": 50, "offset": 150, "spot": borders.width - randInt(150)
     },
+    {
+        "size": 1, "type": "fairy", "path": "t-p", "hp": 30, "vx": 0, "vy": 3, "x": null, "y": -50, "offset": null, "spot": null
+    }
 ];
 
 let delay = 100;
 function spawnEnemies(){
-    while(enemies.length < 1 && delay-- <= 0){
+    while(enemies.length < wave_size && delay-- <= 0){
         let wave = waves[Math.floor(Math.random()*waves.length)];
         // let wave = waves[1];
         for(var i=0; i<wave["size"]; i++){
             if(wave["path"] == "l-r" || wave["path"] == "tl-rb"){
                 var x = wave["x"] - i*wave["offset"];
+                var state = randInt(80);
             }else if(wave["path"] == "r-l" || wave["path"] == "tr-lb"){
                 var x = wave["x"] + i*wave["offset"] + borders.width;
+                var state = randInt(80);
+            }else if(wave["path"] == "t-p"){
+                var x = borders.width / 2 >> 0;
+                var state = randInt(200);
             }
             enemies.push(
                 new Enemy(
-                    x, wave["y"], wave["vx"], wave["vy"], wave["hp"], wave["type"], wave["path"], wave["spot"]
+                    x, wave["y"], wave["vx"], wave["vy"], wave["hp"], wave["type"], wave["path"], wave["spot"], state
                 )
             );
         }
-        delay = 100;
+        delay = delay_constant;
     }
 }
 
@@ -196,7 +228,7 @@ let delta = {x:0, y:0};
 // let prev_delta = delta;
 function movePlayer(){
 
-    keyMap.focus ? speed = 4: speed = 8;
+    keyMap.focus ? speed = top_speed/2: speed = top_speed;
 
     if (keyMap.left) { 
         delta.x -= accel; 
@@ -211,30 +243,38 @@ function movePlayer(){
         delta.y += accel; 
     }
 
-    /* if not moving left or right then slow down */
-    if (!keyMap.left && !keyMap.right) {
-        if (delta.x > 0) {
-            delta.x -= deccel;
-        } else if (delta.x < 0) {
-            delta.x += deccel;
-        }
-    }
+    // /* if not moving left or right then slow down */
+    // if (!keyMap.left && !keyMap.right) {
+    //     if (delta.x > 0) {
+    //         delta.x -= deccel;
+    //     } else if (delta.x < 0) {
+    //         delta.x += deccel;
+    //     }
+    // }
 
-    /* if not moving up or down then slow down */
+    // /* if not moving up or down then slow down */
+    // if (!keyMap.up && !keyMap.down) {
+    //     if (delta.y > 0) {
+    //         delta.y -= deccel;
+    //     } else if (delta.y < 0) {
+    //         delta.y += deccel;
+    //     }
+    // }
+
+    /* stop abruptly */
+    if (!keyMap.left && !keyMap.right) {
+        delta.x = 0;
+    }
     if (!keyMap.up && !keyMap.down) {
-        if (delta.y > 0) {
-            delta.y -= deccel;
-        } else if (delta.y < 0) {
-            delta.y += deccel;
-        }
+        delta.y = 0;
     }
 
     /* only `accel` up to `speed` */
     if (Math.abs(delta.x) > speed) {
-        delta.x > speed ? delta.x = speed: delta.x = -speed;
+        delta.x > 0 ? delta.x = speed: delta.x = -speed;
     }
     if (Math.abs(delta.y) > speed) {
-        delta.y > speed ? delta.y = speed: delta.y = -speed;
+        delta.y > 0 ? delta.y = speed: delta.y = -speed;
     }
 
     /* make diagonals move same speed as cardinal directions */
@@ -265,9 +305,15 @@ function movePlayer(){
         delta.y = 0;
     }
 
-    document.getElementById("player").style["top"] = `${Math.round(player.position.y)}px`;
-    document.getElementById("player").style["left"] = `${Math.round(player.position.x)}px`;
-
+    document.getElementById("player").style["top"] = `${player.position.y}px`;
+    document.getElementById("player").style["left"] = `${player.position.x}px`;
+    if(delta.x < 0){
+        document.getElementById("player").style["transform"] = `rotate(-10deg)`; 
+    }else if(delta.x > 0){
+        document.getElementById("player").style["transform"] = `rotate(10deg)`; 
+    }else{
+        document.getElementById("player").style["transform"] = `rotate(0deg)`;
+    }
 }
 
 /* Fires one of multiple types of shot */
@@ -292,11 +338,19 @@ function fire(){
     }
     /* Shoots in a spread pattern */
     function spread(){
-        bullets.push(
-            new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed), 
-            new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -2, -bullet_speed), 
-            new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 2, -bullet_speed)
-        );
+        if(keyMap["focus"]){
+            bullets.push(
+                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed), 
+                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -0.5, -bullet_speed), 
+                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 0.5, -bullet_speed)
+            );
+        }else{
+            bullets.push(
+                new Bullet(player.position.x + l_offset, player.position.y + h_offset, 0, -bullet_speed), 
+                new Bullet(player.position.x + l_offset-15, player.position.y + h_offset, -2, -bullet_speed), 
+                new Bullet(player.position.x + l_offset+15, player.position.y + h_offset, 2, -bullet_speed)
+            );
+        }
     }
     if (keyMap.shoot) { 
         if (cooldown <= 0){
@@ -314,7 +368,9 @@ function fire(){
     }
 }
 
+
 /* Make the bullets move */
+let phi = 0;
 function moveBullets(){
     let output = '';
     for(let i=0; i<bullets.length; i++){
@@ -323,10 +379,12 @@ function moveBullets(){
         } else if (bullets[i].x < 0 || bullets[i].x + 10 > borders.width) {
             bullets.splice(i, 1);
         } else {
-            output += `<div class="bullet" style="position:absolute;top:${bullets[i].y+=bullets[i].vy}px;left:${bullets[i].x+=bullets[i].vx}px;"></div>`;
+            output += `<div class="bullet spin" style="position:absolute;top:${bullets[i].y+=bullets[i].vy}px;left:${bullets[i].x+=bullets[i].vx}px;transform:rotate(${phi}deg);"></div>`;
         }
     }
     document.getElementById("bullets").innerHTML = output;
+    phi += angular_velocity;
+    phi = phi % 360;
 }
 
 /* Moves the leaves */
@@ -386,18 +444,33 @@ function detectBulletCollisions(){
         }
     }
 
-    let hitbox = 40; 
+    let hitbox = 32; 
     for(let i=0; i<enemyBullets.length; i++){
         let ex = enemyBullets[i].x;
         let px = player.position.x;
-        if(ex-hitbox-10 < px && ex-10 > px){
+        if(ex-hitbox+10 < px && ex-10 > px){
             let ey = enemyBullets[i].y;
             let py = player.position.y;
-            if(ey-90 < py && ey-50 > py){
+            if(ey-82 < py && ey-50 > py){
                 alert(`You have defeated ${count} fairies!`);
                 location.reload();
                 count = 0;
                 enemyBullets.splice(i, 1);
+            }
+        }  
+    }
+
+    for(let i=0; i<enemies.length; i++){
+        let ex = enemies[i].x;
+        let px = player.position.x;
+        if(ex-hitbox+10 < px && ex-10 > px){
+            let ey = enemies[i].y;
+            let py = player.position.y;
+            if(ey-82 < py && ey-50 > py){
+                alert(`You have defeated ${count} fairies!`);
+                location.reload();
+                count = 0;
+                enemies.splice(i, 1);
             }
         }  
     }
@@ -438,13 +511,13 @@ function pause(){
 let start = 0;
 function scrollBackground(){
     document.querySelector("body").style.backgroundPosition = `0px ${start}px`;
-    start < 450 ? start+=2 : start=0;
+    start < 450 ? start+=1 : start=0;
 }
 
 /* Displays the hitbix in focus mode */
 function showHitbox(){
     if(keyMap["focus"]){
-        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y+50}px;left:${player.position.x+20}px;"></div>`
+        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y+50}px;left:${player.position.x+28}px;"></div>`
         document.getElementById("hitbox").innerHTML = ele;
     }else{
         document.getElementById("hitbox").innerHTML = '';
@@ -469,11 +542,28 @@ function gameLoop(){
         detectBulletCollisions();
         genLeaves();
         moveLeaves();
+        difficulty();
     }
     highlightKeys();
     showHitbox();
 }
 setInterval(gameLoop, target_frame_time);
+
+function difficulty(){
+    if(count == 20){
+        console.log("normal");
+        let wave_size = 15;
+        let delay_constant = 300;
+    }else if(count == 50){
+        console.log("hard");
+        let wave_size = 18;
+        let delay_constant = 200;
+    }else if(count == 100){
+        console.log("lunatic");
+        let wave_size = 21;
+        let delay_constant = 100;
+    }
+}
 
 /* sound effects */
 var hit = new Audio('sound/effects/160760__cosmicembers__object-hit.mp3');
@@ -482,6 +572,7 @@ var shot = new Audio('sound/effects/263595__porkmuncher__swoosh.mp3');
 /* plays the BGM on a loop */
 var audio = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
 audio.play();
+audio.volume = 0.5;
 
 /* allows pausing the bgm */
 var is_playing = true;
@@ -496,3 +587,9 @@ audioPause.addEventListener("click", function(){
     }
     is_playing = !is_playing;
 });
+
+function volume(){
+    let v = document.getElementById("volume").value;
+    audio.volume = 0.5;
+    document.getElementById("volume%").innerHTML = `${v*100}%`;
+}
