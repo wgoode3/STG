@@ -75,7 +75,7 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x > enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot += 300;
+                enemies[i].spot += 150;
             }
         }else if(enemies[i].path == "r-l"){
             // right to left
@@ -89,7 +89,7 @@ function moveEnemies(){
                 enemies.splice(i, 1);
             }else if(enemies[i].x < enemies[i].spot){
                 enemies[i].shoot();
-                enemies[i].spot -= 300;
+                enemies[i].spot -= 150;
             }
         }else if(enemies[i].path == "tl-rb"){
             // top left to right bottom
@@ -352,7 +352,7 @@ function fire(){
     }
     if (keyMap.shoot) { 
         if (cooldown <= 0){
-            shot.play();
+            // shot.play();
             if (player.power === 'single') {
                 single();
             } else if(player.power === 'double') {
@@ -457,6 +457,7 @@ function detectBulletCollisions(){
             if(ey-90 < py && ey-50 > py){
                 console.log("You should try easy mode.");
                 alert(`You have defeated ${count} fairies!`);
+                location.reload();
                 count = 0;
                 enemyBullets.splice(i, 1);
             }

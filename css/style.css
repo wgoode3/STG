@@ -33,13 +33,13 @@
 
 body {
     background-color: var(--field);
-    background: url("../background/autumn-forest-tile.jpg") 0px 0px;
+    background: url("../img/background/autumn-forest-tile.jpg") 0px 0px;
     position: absolute;
     overflow: hidden;
 }
 
 #player {
-    background: url('../momiji/sprites.png') 0px 0px;
+    background: url('../img/sprites/momiji.png') 0px 0px;
     width:110px;
     height:150px;
     position:absolute;
@@ -162,19 +162,19 @@ body {
 }
 
 .bullet {
-    background: url('../momiji/sprites.png') 65px 94px;
+    background: url('../img/sprites/momiji.png') 65px 94px;
     height: 17px;
     width: 17px;
 }
 
 .enemy-bullet {
-    background: url('../momiji/sprites.png') 39px 94px;
+    background: url('../img/sprites/momiji.png') 39px 94px;
     height: 17px;
     width: 17px;
 }
 
 .leaf {
-    background: url('../momiji/sprites.png') -60px 40px;
+    background: url('../img/sprites/momiji.png') -60px 40px;
     height: 30px;
     width: 30px;
 }
@@ -186,7 +186,7 @@ body {
 }
 
 .enemy {
-    background: url('../momiji/sprites.png') 84px -5px;
+    background: url('../img/sprites/momiji.png') 84px -5px;
     height: 83px;
     width: 83px;
 }
