@@ -593,6 +593,6 @@ audioPause.addEventListener("click", function(){
 
 function volume(){
     let v = document.getElementById("volume").value;
-    audio.volume = v;
+    bgm.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }
