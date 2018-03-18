@@ -28,8 +28,26 @@ const upKey    = 38, // up arrow
 /* Set how often the debug stats update */
 const rate = 5;
 
+/* Set the playfield to be the window size */
+const borders = {
+    'width': window.innerWidth,
+    'height': window.innerHeight 
+}
+
+/* Player position and current power */
+const player = {
+    'position': {
+        'x': borders.width/2,
+        'y': borders.height/2
+    },
+    'power': 'spread'
+}
+
 /* Speed can change based on focus mode */
 let speed = 16;
 
 /* Fairies defeated */
 let count = 0;
+
+/* tells if the game is paused */
+let paused = false;

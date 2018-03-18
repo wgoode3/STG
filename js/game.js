@@ -3,36 +3,6 @@
 //     return false;
 // }
 
-/* Set the playfield to be the window size */
-const borders = {
-    'width': window.innerWidth,
-    'height': window.innerHeight 
-}
-
-/* Enemy Move Patterns */
-const paths = {
-    'rtl': {
-        'spawn': {
-            x: borders.width + 50,
-            y: 100
-        },
-        'velocity': {
-            vx:-5,
-            vy:-1
-        }
-    }
-}
-
-const player = {
-    'position': {
-        'x': borders.width/2,
-        'y': borders.height/2
-    },
-    'power': 'spread'
-}
-
-let paused = false;
-
 /* Item class - items have position and a value */
 function Item(x, y, value){
     this.x = x;
@@ -49,23 +19,33 @@ function Bullet(x, y, vx, vy){
 }
 
 /* Enemy class - has position and health */
-function Enemy(x, y, v, hp, type, path, spot){
+function Enemy(x, y, vx, vy, hp, type, path, spot){
     this.x = x;
     this.y = y;
-    this.v = v;
+    this.vx = vx;
+    this.vy = vy;
     this.hp = hp;
     this.type = type;
     this.path = path;
     this.spot = spot;
 }
 
+/* Purely cosmetic leaves */
+function Leaf(x,y, state){
+    this.x = x;
+    this.y = y;
+    this.state = state;
+    this.vy = 1;
+}
+
 /* Should move the enemies about*/
 function moveEnemies(){
     let output = '';
     for(let i=0; i<enemies.length; i++){
-        if(enemies[i].path == "l-r"){
+        if(enemies[i].path == "l-r" || enemies[i].path == "tl-rb"){
             // left to right
-            enemies[i].x += enemies[i].v
+            enemies[i].x += enemies[i].vx
+            enemies[i].y += enemies[i].vy
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
                 hit.play();
@@ -77,9 +57,10 @@ function moveEnemies(){
                 enemies[i].shoot();
                 enemies[i].spot += 150;
             }
-        }else if(enemies[i].path == "r-l"){
+        }else if(enemies[i].path == "r-l" || enemies[i].path == "tr-lb"){
             // right to left
-            enemies[i].x += enemies[i].v
+            enemies[i].x += enemies[i].vx
+            enemies[i].y += enemies[i].vy
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
                 hit.play();
@@ -91,10 +72,6 @@ function moveEnemies(){
                 enemies[i].shoot();
                 enemies[i].spot -= 150;
             }
-        }else if(enemies[i].path == "tl-rb"){
-            // top left to right bottom
-        }else if(enemies[i].path == "tr-lb"){
-            // top right to left bottom
         }else if(enemies[i].path == "t-p"){
             // top to player
         }
@@ -127,6 +104,7 @@ Enemy.prototype.shoot = function(){
     }
 }
 
+/* Make the enemy bullets move */
 function moveEnemyBullets(){
     let output = '';
     for(let i=0; i<enemyBullets.length; i++){
@@ -141,28 +119,19 @@ function moveEnemyBullets(){
     document.getElementById("enemy-bullets").innerHTML = output;
 }
 
+/* queues up various types of enemy attack waves */
 const waves = [
     {
-        "size": 10,
-        "type": "fairy",
-        "path": "l-r",
-        "hp": 3,
-        "v": 4,
-        "x": -50,
-        "y": 150,
-        "offset": 200,
-        "spot": 150
+        "size": 10, "type": "fairy", "path": "l-r", "hp": 3, "vx": 4, "vy": 0, "x": -50, "y": 150, "offset": 200, "spot": 150
     },
     {
-        "size": 10,
-        "type": "fairy",
-        "path": "r-l",
-        "hp": 3,
-        "v": -4,
-        "x": 50,
-        "y": 150,
-        "offset": 200,
-        "spot": borders.width - 150
+        "size": 10, "type": "fairy", "path": "r-l", "hp": 3, "vx": -4, "vy": 0, "x": 50, "y": 150, "offset": 200, "spot": borders.width - 150
+    },
+    {
+        "size": 8, "type": "fairy", "path": "tl-rb", "hp": 3, "vx": 5, "vy": 1, "x": -50, "y": 50, "offset": 150, "spot": 150
+    },
+    {
+        "size": 8, "type": "fairy", "path": "tr-lb", "hp": 3, "vx": -5, "vy": 1, "x": 50, "y": 50, "offset": 150, "spot": borders.width - 150
     },
 ];
 
@@ -172,40 +141,24 @@ function spawnEnemies(){
         let wave = waves[Math.floor(Math.random()*waves.length)];
         // let wave = waves[1];
         for(var i=0; i<wave["size"]; i++){
-            if(wave["path"] == "l-r"){
-                enemies.push(new Enemy(
-                    wave["x"] - i*wave["offset"], 
-                    wave["y"],
-                    wave["v"],
-                    wave["hp"],
-                    wave["type"],
-                    wave["path"],
-                    wave["spot"]
-                ));
-            }else if(wave["path"] == "r-l"){
-                enemies.push(new Enemy(
-                    wave["x"] + i*wave["offset"] + borders.width, 
-                    wave["y"],
-                    wave["v"],
-                    wave["hp"],
-                    wave["type"],
-                    wave["path"],
-                    wave["spot"]
-                ));
+            if(wave["path"] == "l-r" || wave["path"] == "tl-rb"){
+                var x = wave["x"] - i*wave["offset"];
+            }else if(wave["path"] == "r-l" || wave["path"] == "tr-lb"){
+                var x = wave["x"] + i*wave["offset"] + borders.width;
             }
+            enemies.push(
+                new Enemy(
+                    x, wave["y"], wave["vx"], wave["vy"], wave["hp"], wave["type"], wave["path"], wave["spot"]
+                )
+            );
         }
         delay = 100;
     }
 }
 
-function Leaf(x,y, state){
-    this.x = x;
-    this.y = y;
-    this.state = state;
-    this.vy = 1;
-}
 
-/* Make some items to test them out */
+/* Make some items (power ups) to test them out */
+// genItems();
 function genItems(){
     items.push(
         new Item(0.25*borders.width, 0.75*borders.height, 'single'),
@@ -213,7 +166,6 @@ function genItems(){
         new Item(0.75*borders.width, 0.75*borders.height, 'spread')
     );
 }
-// genItems();
 
 function randX(){
     return Math.floor(Math.random()*(borders.width-50))+25;
@@ -227,21 +179,17 @@ function randInt(num){
     return Math.floor(Math.random()*(num))+1;
 }
 
+/* number of leaves based on screen size */
+const numLeaves = borders.width * borders.height / 25000 >> 0;
 /* Make some leaves! */
 function genLeaves(){
-    while(leaves.length < 30){
+    while(leaves.length < numLeaves){
         leaves.push(
             // turn over a new leaf, heh
             new Leaf(randX(), randY(), randInt(80))
         );
     }
 }
-
-/* Make an enemy to display */
-// function spawnEnemies(){
-//     enemies.push(new Enemy(0.5*borders.width, 0.15*borders.height, 10, "", 'rtl'));
-// }
-// spawnEnemies();
 
 /* Moves the player around */
 let delta = {x:0, y:0};
@@ -421,15 +369,6 @@ function displayItems(){
 }
 displayItems();
 
-/* Display the enemies */
-function displayEnemies(){
-    let output = ''
-    for(let i=0; i<enemies.length; i++){
-        output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`
-    }
-    document.getElementById("enemies").innerHTML = output;
-}
-
 /* Detects all bullet collisions */
 function detectBulletCollisions(){
     for(let i=0; i<enemies.length; i++){
@@ -446,8 +385,8 @@ function detectBulletCollisions(){
             } 
         }
     }
-    let hitbox = 40; 
 
+    let hitbox = 40; 
     for(let i=0; i<enemyBullets.length; i++){
         let ex = enemyBullets[i].x;
         let px = player.position.x;
@@ -455,7 +394,6 @@ function detectBulletCollisions(){
             let ey = enemyBullets[i].y;
             let py = player.position.y;
             if(ey-90 < py && ey-50 > py){
-                console.log("You should try easy mode.");
                 alert(`You have defeated ${count} fairies!`);
                 location.reload();
                 count = 0;
@@ -464,8 +402,6 @@ function detectBulletCollisions(){
         }  
     }
 }
-
-
 
 /* Allows the user to pick up an item */
 function pickUpItem(){
@@ -505,6 +441,7 @@ function scrollBackground(){
     start < 450 ? start+=2 : start=0;
 }
 
+/* Displays the hitbix in focus mode */
 function showHitbox(){
     if(keyMap["focus"]){
         var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y+50}px;left:${player.position.x+20}px;"></div>`
@@ -538,13 +475,15 @@ function gameLoop(){
 }
 setInterval(gameLoop, target_frame_time);
 
+/* sound effects */
+var hit = new Audio('sound/effects/160760__cosmicembers__object-hit.mp3');
+var shot = new Audio('sound/effects/263595__porkmuncher__swoosh.mp3');
+
 /* plays the BGM on a loop */
 var audio = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
 audio.play();
 
-var hit = new Audio('sound/effects/160760__cosmicembers__object-hit.mp3');
-var shot = new Audio('sound/effects/263595__porkmuncher__swoosh.mp3');
-
+/* allows pausing the bgm */
 var is_playing = true;
 var audioPause = document.getElementById("audio-pause");
 audioPause.addEventListener("click", function(){
