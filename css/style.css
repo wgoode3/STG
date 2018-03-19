@@ -1,30 +1,22 @@
+/* Project CSS, could use some refactoring */
+
 /* Color variables to play with */
 :root {
     /* Transparent Grey */
     --panel: rgba(155, 155, 155, 0.3);
     /* Backround Color */
     --field: #111;
-    /* Player color */
-    --player: #f0f;
     /* Transparent Player */
     --tran: rgba(255, 0, 255, .5);
     /* Text Color */
     --text: #fff;
-    /* Bullet Color */
-    --bullet: #ff0;
-    /* Orange Powerup */
-    --orange: rgba(255, 165, 0, .8);
-    /* Cyan Powerup */
-    --cyan: rgba(0, 255, 255, .8);
-    /* Green Powerup */
-    --green: rgba(0, 255, 0, .8);
-    /* Purple Enemy */
-    --purple: rgba(153, 102, 255, .8);
     /* Hitbox Red */
     --red: rgba(255, 0, 0, .5);
+    /* This color was still being used a few places... */
+    --player: #f0f;
 }
 
-/* CSS reset */
+/* basic CSS reset */
 * {
     margin: 0px;
     padding: 0px;
@@ -33,10 +25,9 @@
 
 body {
     background-color: var(--field);
-    /*background: url("../img/background/autumn-forest-tile.jpg") 0px 0px;*/
-    /*position: absolute;
-    overflow: hidden;*/
 }
+
+/* SPRITES */
 
 #player {
     background: url('../img/sprites/momiji.png') 0px 0px;
@@ -44,6 +35,44 @@ body {
     height:150px;
     position:absolute;
 } 
+
+.bullet {
+    background: url('../img/sprites/momiji.png') 20px 98px;
+    height: 24px;
+    width: 24px;
+}
+
+.bullet1 {
+    background: url('../img/sprites/momiji.png') 39px 94px;
+    height: 17px;
+    width: 17px;
+}
+
+.bullet2 {
+    background: url('../img/sprites/momiji.png') 65px 94px;
+    height: 17px;
+    width: 17px;
+}
+
+.leaf {
+    background: url('../img/sprites/momiji.png') -60px 40px;
+    height: 30px;
+    width: 30px;
+}
+
+.enemy {
+    background: url('../img/sprites/momiji.png') 75px -5px;
+    height: 70px;
+    width: 70px;
+}
+
+.item {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+}
+
+/* /SPRITES */
 
 #top-right {
     color: var(--text);
@@ -79,6 +108,8 @@ body {
     background-color: var(--panel);
 }
 
+/* KEYS */
+
 #keys {
     position: absolute;
     top: 68px;
@@ -103,30 +134,27 @@ body {
     left: -61px;
 }
 
-#shoot {
+#shoot, #bomb, #pause {
     position: relative;
     top: 32px;
     left: -122px;
 }
 
-#bomb {
-    position: relative;
-    top: 6px;
-    left: 32px;
-}
-
-#pause {
-    position: relative;
-    top: 6px;
-    left: 32px;
-}
-
 #focus {
     width: 80px !important;
     position: relative;
-    top: 36px;
-    left: -60px;
+    top: 64px;
+    left: -212px;
 }
+
+.highlight {
+    color: var(--player) !important;
+    border-color: var(--player) !important;
+    /* Glow Effect! WOOO! */
+    box-shadow: 0px 0px 5px 5px var(--tran);
+}
+
+/* /KEYS */
 
 #frame {
     color: var(--text);
@@ -151,49 +179,6 @@ body {
 
 .hidden {
     display: none;
-}
-
-.highlight {
-    color: var(--player) !important;
-    border-color: var(--player) !important;
-    /* Glow Effect! WOOO! */
-    box-shadow: 0px 0px 5px 5px var(--tran);
-}
-
-.bullet {
-    background: url('../img/sprites/momiji.png') 20px 98px;
-    height: 24px;
-    width: 24px;
-}
-
-.bullet1 {
-    background: url('../img/sprites/momiji.png') 39px 94px;
-    height: 17px;
-    width: 17px;
-}
-
-.bullet2 {
-    background: url('../img/sprites/momiji.png') 65px 94px;
-    height: 17px;
-    width: 17px;
-}
-
-.leaf {
-    background: url('../img/sprites/momiji.png') -60px 40px;
-    height: 30px;
-    width: 30px;
-}
-
-.item {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-}
-
-.enemy {
-    background: url('../img/sprites/momiji.png') 75px -5px;
-    height: 70px;
-    width: 70px;
 }
 
 label {

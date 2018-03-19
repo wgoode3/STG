@@ -1,7 +1,4 @@
-/* Prevent accidental refresh */
-// window.onbeforeunload = function () {
-//     return false;
-// }
+/* The main game file, I really should modularize this a bit more */
 
 /* Item class - items have position and a value */
 function Item(x, y, value){
@@ -17,6 +14,7 @@ function Bullet(x, y, vx, vy, type){
     this.vx = vx;
     this.vy = vy;
     this.type = type;
+    this.phi = 0;
 }
 
 /* Enemy class - has position and health */
@@ -40,7 +38,10 @@ function Leaf(x,y, state){
     this.vy = 1;
 }
 
-/* Should move the enemies about*/
+/* Moves the enemies about */
+
+// TODO: this looks like it could be refactored
+
 function moveEnemies(){
     let output = '';
     for(let i=0; i<enemies.length; i++){
@@ -106,10 +107,7 @@ function moveEnemies(){
 
 /* Make the enemies shoot at the player */
 Enemy.prototype.shoot = function(){
-    // multiple enemy shot types because sounds like fun
-
     if(Math.random() > 0.5){
-        // direct shot
         let bulletSpeed = 8;
         let px = player.position.x;
         let py = player.position.y;
@@ -118,13 +116,14 @@ Enemy.prototype.shoot = function(){
         let distance = Math.pow((Math.pow(Dx, 2) + Math.pow(Dy, 2)), 0.5)
         let vx = (Dx/distance)*bulletSpeed;
         let vy = (Dy/distance)*bulletSpeed;
+        /* line of bullets directed at the player */
         enemyBullets.push(new Bullet(this.x, this.y, vx, vy, "bullet1"));
         enemyBullets.push(new Bullet(this.x, this.y, vx*0.9, vy*0.9, "bullet1"));
         enemyBullets.push(new Bullet(this.x, this.y, vx*0.8, vy*0.8, "bullet1"));
         enemyBullets.push(new Bullet(this.x, this.y, vx*0.7, vy*0.7, "bullet1"));
         enemyBullets.push(new Bullet(this.x, this.y, vx*0.6, vy*0.6, "bullet1"));
     }else{
-        // curtain shot
+        /* curtain of bullets */
         enemyBullets.push(new Bullet(this.x, this.y, 0, 2.5, "bullet2"));
         enemyBullets.push(new Bullet(this.x, this.y, 1.5, 2, "bullet2"));
         enemyBullets.push(new Bullet(this.x, this.y, -1.5, 2, "bullet2")); 
@@ -167,11 +166,11 @@ const waves = [
     }
 ];
 
+/* Spawns enemy waves */
 let delay = 100;
 function spawnEnemies(){
     while(enemies.length < wave_size && delay-- <= 0){
         let wave = waves[Math.floor(Math.random()*waves.length)];
-        // let wave = waves[1];
         for(var i=0; i<wave["size"]; i++){
             if(wave["path"] == "l-r" || wave["path"] == "tl-rb"){
                 var x = wave["x"] - i*wave["offset"];
@@ -204,14 +203,17 @@ function genItems(){
     );
 }
 
+/* Returns a random integer in the width of the play area */
 function randX(){
     return Math.floor(Math.random()*(borders.width-50))+25;
 }
 
+/* Returns a random integer in the height of the play area */
 function randY(){
     return Math.floor(Math.random()*(borders.height-50))+25;
 }
 
+/* Returns a random int from 1 to num */
 function randInt(num){
     return Math.floor(Math.random()*(num))+1;
 }
@@ -311,9 +313,9 @@ function movePlayer(){
     document.getElementById("player").style["top"] = `${player.position.y}px`;
     document.getElementById("player").style["left"] = `${player.position.x}px`;
     if(delta.x < 0){
-        document.getElementById("player").style["transform"] = `rotate(-10deg)`; 
+        document.getElementById("player").style["transform"] = `rotate(-5deg)`; 
     }else if(delta.x > 0){
-        document.getElementById("player").style["transform"] = `rotate(10deg)`; 
+        document.getElementById("player").style["transform"] = `rotate(5deg)`; 
     }else{
         document.getElementById("player").style["transform"] = `rotate(0deg)`;
     }
@@ -371,9 +373,7 @@ function fire(){
     }
 }
 
-
 /* Make the bullets move */
-let phi = 0;
 function moveBullets(){
     let output = '';
     for(let i=0; i<bullets.length; i++){
@@ -382,12 +382,12 @@ function moveBullets(){
         } else if (bullets[i].x < 0 || bullets[i].x + 10 > borders.width) {
             bullets.splice(i, 1);
         } else {
-            output += `<div class="bullet spin" style="position:absolute;top:${bullets[i].y+=bullets[i].vy}px;left:${bullets[i].x+=bullets[i].vx}px;transform:rotate(${phi}deg);"></div>`;
+            bullets[i].phi += angular_velocity;
+            output += `<div class="bullet spin" style="position:absolute;top:${bullets[i].y+=bullets[i].vy}px;left:${bullets[i].x+=bullets[i].vx}px;transform:rotate(${bullets[i].phi}deg);"></div>`;
         }
     }
     document.getElementById("bullets").innerHTML = output;
-    phi += angular_velocity;
-    phi = phi % 360;
+
 }
 
 /* Moves the leaves */
@@ -481,9 +481,7 @@ function detectBulletCollisions(){
 
 /* Allows the user to pick up an item */
 function pickUpItem(){
-
     let l_offset = (player_width/2) + 10
-
     for(let i=0; i<items.length; i++){
         let ix = items[i].x;
         let px = player.position.x;
@@ -552,6 +550,7 @@ function gameLoop(){
 }
 setInterval(gameLoop, target_frame_time);
 
+/* Increases difficulty after 20, 50, and 100 kills */
 function difficulty(){
     if(count == 20){
         console.log("normal");
@@ -572,7 +571,7 @@ function difficulty(){
 var hit = new Audio('sound/effects/84803__djahren__plastic-bang.mp3');
 
 /* plays the BGM on a loop */
-var bgm = new Audio('sound/bgm/[08]FallofFall~AkimekuTaki.mp3');
+var bgm = new Audio('sound/bgm/[08]FallOfFall~AkimekuTaki.mp3');
 bgm.play();
 bgm.loop = true;
 bgm.volume = 0.5;
@@ -591,8 +590,9 @@ audioPause.addEventListener("click", function(){
     is_playing = !is_playing;
 });
 
+/* Adjusts the volume */
 function volume(){
     let v = document.getElementById("volume").value;
-    audio.volume = v;
+    bgm.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }
