@@ -74,3 +74,19 @@ let paused = false;
 
 /* confirmed */
 let confirmed = false;
+
+/* various sound effects */
+var hit = new Audio('sound/effects/enep00.mp3');
+hit.volume = 0.3;
+var plhit = new Audio('sound/effects/pldead00.mp3');
+plhit.volume = 0.3;
+var select = new Audio('sound/effects/select00.mp3')
+select.volume = 0.3;
+var ok = new Audio('sound/effects/ok00.mp3')
+ok.volume = 0.3;
+
+/* plays the BGM on a loop */
+var bgm = new Audio('sound/bgm/[08]FallOfFall~AkimekuTaki.mp3');
+bgm.play();
+bgm.loop = true;
+bgm.volume = 0.3;

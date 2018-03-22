@@ -38,6 +38,34 @@ function Leaf(x,y, state){
     this.vy = 1;
 }
 
+/* Game Loop, runs all te game logic in a set interval */
+function gameLoop(){
+    if ( !document.hasFocus() && !paused ){
+        pause();
+    } else if ( confirmed ) {
+        confirm();
+    } else if ( paused ) {
+        pauseSelections();
+    } else {
+        frameTime();
+        scrollBackground();
+        movePlayer();
+        pickUpItem();
+        fire();
+        moveBullets();
+        spawnEnemies();
+        moveEnemies();
+        moveEnemyBullets();
+        detectBulletCollisions();
+        genLeaves();
+        moveLeaves();
+        difficulty();
+        showHitbox();
+    }
+    highlightKeys();
+}
+setInterval(gameLoop, target_frame_time);
+
 /* Moves the enemies about */
 
 // TODO: this looks like it could be refactored
@@ -558,7 +586,7 @@ function playerHit(){
 
 /* Pauses the game */
 function pause(){
-    document.getElementById("pauseOverlay").style["left"] = `${(borders.width/2 >> 0) - 200}px`;
+    document.getElementById("pauseOverlay").style["left"] = `${(borders.width/2 >> 0) - 250}px`;
     if (!paused) {
         paused = !paused;
         document.getElementById("modal-bg").style.display = "";
@@ -580,28 +608,34 @@ let delayed = false;
 function pauseSelections(){
     document.getElementById("score").innerHTML = `You have defeated ${count} fairies`;
     if(keyMap["up"]){
+        select.play();
         document.getElementById("continue").classList.add("active");
         document.getElementById("retry").classList.remove("active");
     }
     if(keyMap["down"]){
+        select.play();
         document.getElementById("continue").classList.remove("active");
         document.getElementById("retry").classList.add("active");
     }
     if(keyMap["shoot"] && player["lives"] > 0){
         if(document.getElementById("continue").classList[0] === "active"){
+            ok.play();
             unPause();
         }else{
+            ok.play();
             confirmed = true;
             delay1s();
             confirm("restart");
         }
     }else if(keyMap["shoot"] && delayed){
         if(document.getElementById("continue").classList[0] === "active"){
+            ok.play();
             confirmed = true;
             delay1s();
             confirm("quit");
         }else{
-            location.reload();
+            ok.play();
+            reset();
         }
     }
 }
@@ -620,26 +654,31 @@ function confirm(thing){
     document.getElementById("continue").innerHTML = "Yes yes yes!";
     document.getElementById("retry").innerHTML = "No...";
     if(keyMap["up"]){
+        select.play();
         document.getElementById("continue").classList.add("active");
         document.getElementById("retry").classList.remove("active");
     }
     if(keyMap["down"]){
+        select.play();
         document.getElementById("continue").classList.remove("active");
         document.getElementById("retry").classList.add("active");
     }
     if(keyMap["shoot"] && !player["lives"] && delayed){
         if(document.getElementById("continue").classList[0] === "active"){
+            ok.play();
             window.history.back();
         }else{
+            ok.play();
             confirmed = false;
             endGameSelections();
         }
     }
     if(keyMap["shoot"] && player["lives"] && delayed){
         if(document.getElementById("continue").classList[0] === "active"){
-            location.reload();
-
+            ok.play();
+            reset();
         }else{
+            ok.play();
             confirmed = false;
             document.getElementById("continue").innerHTML = "Continue";
             document.getElementById("retry").innerHTML = "Retry";
@@ -647,6 +686,29 @@ function confirm(thing){
             unPause();
         }
     }
+}
+
+/* reset everything to the start of the game/level */
+function reset(){
+    count = 0;
+    confirmed = false;
+    bullets.length = 0;
+    items.length = 0;
+    enemies.length = 0;
+    enemyBullets.length = 0;
+    leaves.length = 0;
+    player['position']['x'] = borders.width/2;
+    player['position']['y'] = borders.height*0.7;
+    player['power'] = 'spread';
+    player['state'] = 0;
+    player['lives'] = 3;
+    bgm.pause();
+    bgm.currentTime = 0;
+    bgm.play();
+    document.getElementById("continue").innerHTML = "Continue";
+    document.getElementById("retry").innerHTML = "Retry";
+    document.getElementById("score").innerHTML = `You have defeated ${count} fairies`;
+    unPause();
 }
 
 /* End game selections */
@@ -678,34 +740,6 @@ function showHitbox(){
     }
 }
 
-/* Game Loop, runs all te game logic in a set interval */
-function gameLoop(){
-    if ( !document.hasFocus() && !paused ){
-        pause();
-    } else if ( confirmed ) {
-        confirm();
-    } else if ( paused ) {
-        pauseSelections();
-    } else {
-        frameTime();
-        scrollBackground();
-        movePlayer();
-        pickUpItem();
-        fire();
-        moveBullets();
-        spawnEnemies();
-        moveEnemies();
-        moveEnemyBullets();
-        detectBulletCollisions();
-        genLeaves();
-        moveLeaves();
-        difficulty();
-        showHitbox();
-    }
-    highlightKeys();
-}
-setInterval(gameLoop, target_frame_time);
-
 /* Increases difficulty after 20, 50, and 100 kills */
 function difficulty(){
     if(count == 20){
@@ -722,19 +756,6 @@ function difficulty(){
         let delay_constant = 100;
     }
 }
-
-/* sound effects */
-var hit = new Audio('sound/effects/enep00.mp3');
-hit.volume = 0.3;
-
-var plhit = new Audio('sound/effects/pldead00.mp3');
-plhit.volume = 0.3;
-
-/* plays the BGM on a loop */
-var bgm = new Audio('sound/bgm/[08]FallOfFall~AkimekuTaki.mp3');
-bgm.play();
-bgm.loop = true;
-bgm.volume = 0.3;
 
 /* allows pausing the bgm */
 var is_playing = true;
@@ -756,5 +777,7 @@ function volume(){
     bgm.volume = v;
     hit.volume = v;
     plhit.volume = v;
+    select.volume = v;
+    ok.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }
