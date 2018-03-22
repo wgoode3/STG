@@ -362,9 +362,6 @@ function movePlayer(){
         player["state"] = 0; 
     }
 
-    
-
-
 }
 
 /* Fires one of multiple types of shot */
@@ -500,7 +497,7 @@ function detectBulletCollisions(){
         if(ex-hitbox < px && ex > px){
             let ey = enemyBullets[i].y;
             let py = player.position.y;
-            if(ey-hitbox < py && ey > py){
+            if(ey-hitbox-30 < py && ey-30 > py){
                 playerHit();
                 enemyBullets.splice(i, 1);
             }
@@ -513,7 +510,7 @@ function detectBulletCollisions(){
         if(ex-hitbox < px && ex > px){
             let ey = enemies[i].y;
             let py = player.position.y;
-            if(ey-hitbox < py && ey > py){
+            if(ey-hitbox-30 < py && ey-30 > py){
                 playerHit();
                 enemies.splice(i, 1);
             }
@@ -545,11 +542,12 @@ function playerHit(){
         plhit.play();
         enemyBullets.length = 0;
         if(!--player["lives"]){
-            pause()
-            alert(`You have defeated ${count} fairies!`);
-            location.reload();
+            pause();
+            endGameSelections();
         }
         player["state"] = 199;
+        player.position.x = borders.width/2;
+        player.position.y = borders.height*0.7;
         let lives = '';
         for(let i=0; i<player["lives"]; i++){
             lives += ' 💖';
@@ -560,13 +558,107 @@ function playerHit(){
 
 /* Pauses the game */
 function pause(){
-    paused = !paused;
-    document.getElementById("pauseOverlay").style["left"] = `${borders.width - 250}px`;
-    if (paused) {
+    document.getElementById("pauseOverlay").style["left"] = `${(borders.width/2 >> 0) - 200}px`;
+    if (!paused) {
+        paused = !paused;
+        document.getElementById("modal-bg").style.display = "";
         document.getElementById("pauseOverlay").classList.remove('hidden');
-    } else {
+    }
+}
+
+/* Unpause the game */
+function unPause(){
+    if(pause){
+        paused = !paused;
+        document.getElementById("modal-bg").style.display = "none";
         document.getElementById("pauseOverlay").classList.add('hidden');
     }
+}
+
+let delayed = false;
+/* Controls when paused */
+function pauseSelections(){
+    document.getElementById("score").innerHTML = `You have defeated ${count} fairies`;
+    if(keyMap["up"]){
+        document.getElementById("continue").classList.add("active");
+        document.getElementById("retry").classList.remove("active");
+    }
+    if(keyMap["down"]){
+        document.getElementById("continue").classList.remove("active");
+        document.getElementById("retry").classList.add("active");
+    }
+    if(keyMap["shoot"] && player["lives"] > 0){
+        if(document.getElementById("continue").classList[0] === "active"){
+            unPause();
+        }else{
+            confirmed = true;
+            delay1s();
+            confirm("restart");
+        }
+    }else if(keyMap["shoot"] && delayed){
+        if(document.getElementById("continue").classList[0] === "active"){
+            confirmed = true;
+            delay1s();
+            confirm("quit");
+        }else{
+            location.reload();
+        }
+    }
+}
+
+/* Changes delayed from false to true in about 1 second */
+function delay1s(){
+    delayed = false;
+    setTimeout(function(){ 
+        delayed = true;
+    }, 1000);
+}
+
+/* Confirm Screen */
+function confirm(thing){
+    document.getElementById("score").innerHTML = "Are you sure?";
+    document.getElementById("continue").innerHTML = "Yes yes yes!";
+    document.getElementById("retry").innerHTML = "No...";
+    if(keyMap["up"]){
+        document.getElementById("continue").classList.add("active");
+        document.getElementById("retry").classList.remove("active");
+    }
+    if(keyMap["down"]){
+        document.getElementById("continue").classList.remove("active");
+        document.getElementById("retry").classList.add("active");
+    }
+    if(keyMap["shoot"] && !player["lives"] && delayed){
+        if(document.getElementById("continue").classList[0] === "active"){
+            window.history.back();
+        }else{
+            confirmed = false;
+            endGameSelections();
+        }
+    }
+    if(keyMap["shoot"] && player["lives"] && delayed){
+        if(document.getElementById("continue").classList[0] === "active"){
+            location.reload();
+
+        }else{
+            confirmed = false;
+            document.getElementById("continue").innerHTML = "Continue";
+            document.getElementById("retry").innerHTML = "Retry";
+            document.getElementById("score").innerHTML = `You have defeated ${count} fairies`;
+            unPause();
+        }
+    }
+}
+
+/* End game selections */
+function endGameSelections(){
+    document.getElementById("score").innerHTML = `You have defeated ${count} fairies`;
+    document.getElementById("continue").innerHTML = "Quit";
+    document.getElementById("retry").innerHTML = "Retry";
+    document.getElementById("modal-bg").style.display = "";
+    document.getElementById("pauseOverlay").style["left"] = `${(borders.width/2 >> 0) - 200}px`;
+    document.getElementById("pauseOverlay").classList.remove('hidden');
+    document.getElementById("continue").classList.remove("active");
+    delay1s();
 }
 
 /* Make the background appear to be moving */
@@ -579,7 +671,7 @@ function scrollBackground(){
 /* Displays the hitbix in focus mode */
 function showHitbox(){
     if(keyMap["focus"]){
-        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y}px;left:${player.position.x+16}px;"></div>`
+        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y+30}px;left:${player.position.x+16}px;"></div>`
         document.getElementById("hitbox").innerHTML = ele;
     }else{
         document.getElementById("hitbox").innerHTML = '';
@@ -588,10 +680,13 @@ function showHitbox(){
 
 /* Game Loop, runs all te game logic in a set interval */
 function gameLoop(){
-    if (!document.hasFocus() && !paused ){
+    if ( !document.hasFocus() && !paused ){
         pause();
-    }
-    if (!paused) {
+    } else if ( confirmed ) {
+        confirm();
+    } else if ( paused ) {
+        pauseSelections();
+    } else {
         frameTime();
         scrollBackground();
         movePlayer();
@@ -605,9 +700,9 @@ function gameLoop(){
         genLeaves();
         moveLeaves();
         difficulty();
+        showHitbox();
     }
     highlightKeys();
-    showHitbox();
 }
 setInterval(gameLoop, target_frame_time);
 
@@ -630,17 +725,16 @@ function difficulty(){
 
 /* sound effects */
 var hit = new Audio('sound/effects/enep00.mp3');
-hit.volume = 0.5;
+hit.volume = 0.3;
 
 var plhit = new Audio('sound/effects/pldead00.mp3');
-hit.volume = 0.5;
+plhit.volume = 0.3;
 
 /* plays the BGM on a loop */
 var bgm = new Audio('sound/bgm/[08]FallOfFall~AkimekuTaki.mp3');
 bgm.play();
 bgm.loop = true;
-bgm.volume = 0.5;
-
+bgm.volume = 0.3;
 
 /* allows pausing the bgm */
 var is_playing = true;
@@ -661,5 +755,6 @@ function volume(){
     let v = document.getElementById("volume").value;
     bgm.volume = v;
     hit.volume = v;
+    plhit.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }

@@ -23,7 +23,7 @@ const upKey    = 38, // up arrow
       rightKey = 39, // right arrow
       shootKey = 90, // z
       bombKey  = 88, // x
-      pauseKey = 80, // p
+      pauseKey = 27, // p 80 esc 27
       focusKey = 16; // shift key
 
 /* Set how often the debug stats update */
@@ -47,7 +47,7 @@ const numLeaves = borders.width * borders.height / 25000 >> 0;
 const player = {
     'position': {
         'x': borders.width/2,
-        'y': borders.height/2
+        'y': borders.height*0.7
     },
     'power': 'spread',
     'state': 0,
@@ -71,3 +71,6 @@ let wave_size = 12;
 
 /* tells if the game is paused */
 let paused = false;
+
+/* confirmed */
+let confirmed = false;

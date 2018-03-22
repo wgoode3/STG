@@ -14,6 +14,8 @@
     --red: rgba(255, 0, 0, .5);
     /* This color was still being used a few places... */
     --player: #f0f;
+    /* The color for the modal */
+    --modal: rgba(22, 22, 22, 0.5);
 }
 
 /* basic CSS reset */
@@ -97,10 +99,15 @@ body {
 }
 
 #pauseOverlay {
+    width: 500px;
     color: var(--text);
     position: absolute;
-    top: 150px;
-    left: 300px;
+    top: 250px;
+}
+
+#pauseOverlay > h3 {
+    padding: 20px;
+    margin-top: 10px;
 }
 
 .top {
@@ -221,8 +228,21 @@ label {
     height: 900px;
 }
 
+#modal-bg {
+    width: 1200px;
+    height: 900px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: var(--modal);
+}
+
+.active {
+    background-color: var(--panel);
+}
+
 @media only screen and (max-width: 1366px) {
-    #field {
+    #field, #modal-bg {
         width: 1024px;
         height: 768px; 
     }
