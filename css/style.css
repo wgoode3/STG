@@ -29,12 +29,20 @@ body {
 
 /* SPRITES */
 
-#player {
+/*#player {
     background: url('../img/sprites/momiji.png') 0px 0px;
     width:110px;
     height:150px;
     position:absolute;
-} 
+}*/
+
+#player {
+    background: url('../img/sprites/momiji_150.png') 0px 0px;
+    width:72px;
+    height:130px;
+    position:absolute;
+    background-position: 108px -12px;
+}
 
 .bullet {
     background: url('../img/sprites/momiji.png') 20px 98px;
@@ -91,7 +99,7 @@ body {
 #pauseOverlay {
     color: var(--text);
     position: absolute;
-    top: 100px;
+    top: 150px;
     left: 300px;
 }
 
@@ -195,6 +203,14 @@ label {
 #volume {
     margin: 10px;
     width: 250px;
+}
+
+#lives {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #f00;
+    text-align: right;
+    margin: 10px;
 }
 
 #field {

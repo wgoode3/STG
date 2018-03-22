@@ -53,6 +53,8 @@ function moveEnemies(){
             enemies[i].state = enemies[i].state % 80;
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
+                hit.pause();
+                hit.currentTime = 0;
                 hit.play();
                 enemies.splice(i, 1);
                 count++;
@@ -70,6 +72,8 @@ function moveEnemies(){
             enemies[i].state = enemies[i].state % 80;
             output += `<div class="enemy" style="position:absolute;top:${enemies[i].y}px;left:${enemies[i].x}px;"></div>`;
             if(enemies[i].hp <= 0){
+                hit.pause();
+                hit.currentTime = 0;
                 hit.play();
                 enemies.splice(i, 1);
                 count++
@@ -95,6 +99,8 @@ function moveEnemies(){
                 enemies[i].shoot();
             }
             if(enemies[i].hp <= 0){
+                hit.pause();
+                hit.currentTime = 0;
                 hit.play();
                 enemies.splice(i, 1);
                 count++
@@ -312,6 +318,8 @@ function movePlayer(){
 
     document.getElementById("player").style["top"] = `${player.position.y}px`;
     document.getElementById("player").style["left"] = `${player.position.x}px`;
+
+    /* rotates the player slightly when going left or right */
     if(delta.x < 0){
         document.getElementById("player").style["transform"] = `rotate(-5deg)`; 
     }else if(delta.x > 0){
@@ -319,6 +327,44 @@ function movePlayer(){
     }else{
         document.getElementById("player").style["transform"] = `rotate(0deg)`;
     }
+
+    /* animates the player a bit using the sprite sheet */
+    switch (player["state"]++) {
+        case 0:
+            document.getElementById("player").style.backgroundPosition = `198px -12px`;
+            break;
+        case 40:
+            document.getElementById("player").style.backgroundPosition = `288px -12px`;
+            break;
+        case 60:
+            document.getElementById("player").style.backgroundPosition = `378px -12px`;
+            break;
+        case 80:
+            document.getElementById("player").style.backgroundPosition = `468px -12px`;
+            break;
+        case 120:
+            document.getElementById("player").style.backgroundPosition = `378px -12px`;
+            break;
+        case 140:
+            document.getElementById("player").style.backgroundPosition = `288px -12px`;
+            break;
+        case 160:
+            document.getElementById("player").style.backgroundPosition = `198px -12px`;
+            player["state"] %= 160
+    }
+
+    /* animates the player a bit after taking a hit */
+    if(player["state"] > 161){
+        document.getElementById("player").style.opacity = (player["state"]%25)/10;
+    }
+    if(player.state == 300){
+        document.getElementById("player").style.opacity = 1;
+        player["state"] = 0; 
+    }
+
+    
+
+
 }
 
 /* Fires one of multiple types of shot */
@@ -451,13 +497,11 @@ function detectBulletCollisions(){
     for(let i=0; i<enemyBullets.length; i++){
         let ex = enemyBullets[i].x;
         let px = player.position.x;
-        if(ex-hitbox+10 < px && ex-10 > px){
+        if(ex-hitbox < px && ex > px){
             let ey = enemyBullets[i].y;
             let py = player.position.y;
-            if(ey-82 < py && ey-50 > py){
-                alert(`You have defeated ${count} fairies!`);
-                location.reload();
-                count = 0;
+            if(ey-hitbox < py && ey > py){
+                playerHit();
                 enemyBullets.splice(i, 1);
             }
         }  
@@ -466,13 +510,11 @@ function detectBulletCollisions(){
     for(let i=0; i<enemies.length; i++){
         let ex = enemies[i].x;
         let px = player.position.x;
-        if(ex-hitbox+10 < px && ex-10 > px){
+        if(ex-hitbox < px && ex > px){
             let ey = enemies[i].y;
             let py = player.position.y;
-            if(ey-82 < py && ey-50 > py){
-                alert(`You have defeated ${count} fairies!`);
-                location.reload();
-                count = 0;
+            if(ey-hitbox < py && ey > py){
+                playerHit();
                 enemies.splice(i, 1);
             }
         }  
@@ -497,6 +539,25 @@ function pickUpItem(){
     }
 }
 
+/* What to do if the player is hit */
+function playerHit(){
+    if(player["state"] < 161){
+        plhit.play();
+        enemyBullets.length = 0;
+        if(!--player["lives"]){
+            pause()
+            alert(`You have defeated ${count} fairies!`);
+            location.reload();
+        }
+        player["state"] = 199;
+        let lives = '';
+        for(let i=0; i<player["lives"]; i++){
+            lives += ' 💖';
+        }
+        document.getElementById("lives").innerHTML = lives;
+    }
+}
+
 /* Pauses the game */
 function pause(){
     paused = !paused;
@@ -518,7 +579,7 @@ function scrollBackground(){
 /* Displays the hitbix in focus mode */
 function showHitbox(){
     if(keyMap["focus"]){
-        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y+50}px;left:${player.position.x+28}px;"></div>`
+        var ele = `<div class="hitbox" style="position:absolute;top:${player.position.y}px;left:${player.position.x+16}px;"></div>`
         document.getElementById("hitbox").innerHTML = ele;
     }else{
         document.getElementById("hitbox").innerHTML = '';
@@ -568,13 +629,18 @@ function difficulty(){
 }
 
 /* sound effects */
-var hit = new Audio('sound/effects/84803__djahren__plastic-bang.mp3');
+var hit = new Audio('sound/effects/enep00.mp3');
+hit.volume = 0.5;
+
+var plhit = new Audio('sound/effects/pldead00.mp3');
+hit.volume = 0.5;
 
 /* plays the BGM on a loop */
 var bgm = new Audio('sound/bgm/[08]FallOfFall~AkimekuTaki.mp3');
 bgm.play();
 bgm.loop = true;
 bgm.volume = 0.5;
+
 
 /* allows pausing the bgm */
 var is_playing = true;
@@ -594,5 +660,6 @@ audioPause.addEventListener("click", function(){
 function volume(){
     let v = document.getElementById("volume").value;
     bgm.volume = v;
+    hit.volume = v;
     document.getElementById("volume%").innerHTML = `${v*100}%`;
 }

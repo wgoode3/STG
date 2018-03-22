@@ -1,7 +1,7 @@
 /* Game constants to play around with */
 const target_frame_time = 16,
-      accel             = 4,
-      deccel            = 8, 
+      accel             = 3,
+      deccel            = 6, 
       size              = 25,
       bullet_speed      = 12,
       angular_velocity  = 15,
@@ -13,8 +13,8 @@ const target_frame_time = 16,
       leaves            = [];
 
 /* Player offset */
-const player_height = 150,
-      player_width  = 110;
+const player_height = 130,
+      player_width  = 72;
 
 /* Key Bindings */
 const upKey    = 38, // up arrow
@@ -49,14 +49,16 @@ const player = {
         'x': borders.width/2,
         'y': borders.height/2
     },
-    'power': 'spread'
+    'power': 'spread',
+    'state': 0,
+    'lives': 3
 }
 
 /* Max player speed */
-let top_speed = 8;
+let top_speed = 6;
 
 /* Speed can change based on focus mode */
-let speed = 8;
+let speed = 6;
 
 /* Fairies defeated */
 let count = 0;
